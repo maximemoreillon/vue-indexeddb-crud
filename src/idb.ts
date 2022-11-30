@@ -8,6 +8,7 @@ https://www.raymondcamden.com/2019/10/16/using-indexeddb-with-vuejs
 
 const DB_NAME = 'itemdb';
 const DB_VERSION = 1;
+const OBJECTSTORE_NAME = 'items'
 
 import Item from '@/types/item'
 
@@ -35,7 +36,9 @@ const getDb = async () => new Promise((resolve, reject) => {
     request.onupgradeneeded =  () => {
         console.log('onupgradeneeded');
         let db = request.result;
-        db.createObjectStore("items", { autoIncrement: true, keyPath: '_id' });
+
+        // Creating the object store
+        db.createObjectStore(OBJECTSTORE_NAME, { autoIncrement: true, keyPath: '_id' });
     }
 
 })
@@ -47,33 +50,15 @@ export const createItem = async (newItem: Item) => {
 
     return new Promise(resolve => {
 
-        const transaction = db.transaction(['items'], 'readwrite')
+        const transaction = db.transaction(OBJECTSTORE_NAME, 'readwrite')
 
         transaction.oncomplete = resolve
 
-        const store = transaction.objectStore('items');
+        const store = transaction.objectStore(OBJECTSTORE_NAME);
         store.put(newItem);
 
     });
 
-}
-
-
-
-    
-export const deleteCat = async ( itemId: string ) => {
-
-    // TODO: find type
-    const db:any = await getDb();
-
-    return new Promise(resolve => {
-
-        let trans = db.transaction(['items'], 'readwrite');
-        trans.oncomplete = resolve
-
-        let store = trans.objectStore('items');
-        store.delete(itemId);
-    });
 }
 
 export const getItems = async () => {
@@ -83,13 +68,16 @@ export const getItems = async () => {
 
     return new Promise<[Item] | []>(resolve => {
 
-        const transaction = db.transaction(['items'], 'readonly')
+        const transaction = db.transaction(OBJECTSTORE_NAME, 'readonly')
 
         transaction.oncomplete = () => {
             resolve(items);
         }
 
-        let store = transaction.objectStore('items');
+        // Otherwise: const request = store.getAll();
+
+
+        let store = transaction.objectStore(OBJECTSTORE_NAME);
         const items: any = [];
 
         store.openCursor().onsuccess = (e: any) => {
@@ -103,4 +91,54 @@ export const getItems = async () => {
     })
 }
 
+export const getItem = async (_id:string) => {
+
+    // Not working yet
+
+    // TODO: find type
+    const db: any = await getDb();
+
+    return new Promise<Item>((resolve, reject) => {
+
+        const transaction = db.transaction(OBJECTSTORE_NAME, 'readonly');
+        transaction.oncomplete = resolve
+
+        const store = transaction.objectStore('items')
+
+        const myIndex = store.index('_id');
+        const request = myIndex.get(1);
+
+
+
+        request.onsuccess = (event: any) => {
+            console.log(event)
+            resolve(event.target.result)
+        }
+        request.onerror = reject
+        
+    });
+}
+
+    
+
+
+
+
+// TODO: Update
+
+
+export const deleteItem = async (itemId: string) => {
+
+    // TODO: find type
+    const db: any = await getDb();
+
+    return new Promise(resolve => {
+
+        let trans = db.transaction(['items'], 'readwrite');
+        trans.oncomplete = resolve
+
+        let store = trans.objectStore('items');
+        store.delete(itemId);
+    });
+}
 

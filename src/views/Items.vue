@@ -3,7 +3,7 @@
         <v-toolbar flat>
             <v-toolbar-title>Items</v-toolbar-title>
             <v-spacer/>
-            <NewItemDialog @itemCreated="queryItems()"/>
+            <NewItemDialog @itemCreated="getItemsFromIDB()"/>
         </v-toolbar>
         <v-divider></v-divider>
         <v-card-text>
@@ -41,12 +41,12 @@ import { getItems } from '@/idb'
 
 const items = ref<[Item] | []>([])
 
-const queryItems = async () => {
+const getItemsFromIDB = async () => {
     items.value = await getItems()
 }
 
 onMounted( () => {
-    queryItems()
+    getItemsFromIDB()
 })
 
 </script>

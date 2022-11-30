@@ -5,7 +5,7 @@ import Item from '@/views/Item.vue'
 
 const routes = [
     { name: 'items', path: '/items', alias: '/', component: Items },
-    { name: 'item', path: '/items/:_id', alias: '/', component: Item },
+    { name: 'item', path: '/items/:_id', component: Item },
 ]
 
 const router = createRouter({
