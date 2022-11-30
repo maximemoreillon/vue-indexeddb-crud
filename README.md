@@ -1,4 +1,6 @@
-# default
+# Vue + IndexedDB CRUD
+
+CRUD operation on records stored in the IndexedDB
 
 ## Project setup
 
