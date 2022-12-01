@@ -5,7 +5,7 @@
         </template>
 
         <v-card title="New item">
-            <v-form @submit.prevent="createItemInIDB()">
+            <v-form @submit.prevent="createItem()">
             
                 <v-card-text>
                     <v-row>
@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
-import { createItem } from '@/idb';
+import { db } from '@/idb';
 const dialog = ref(false)
 const loading = ref(false)
 
@@ -48,13 +48,12 @@ const newItem = reactive({
 const emit = defineEmits(['itemCreated'])
 
 
-const createItemInIDB = async () => {
+const createItem = async () => {
     loading.value = true
     try {
-        await createItem({...newItem})
+        await db.items.add({...newItem});
         emit('itemCreated')
         dialog.value = false
-
     } catch (error) {
         console.error(error)
         alert('Failed to create item')
