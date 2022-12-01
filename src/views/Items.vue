@@ -7,7 +7,7 @@
         </v-toolbar>
         <v-divider></v-divider>
         <v-card-text>
-            <v-table>
+            <v-table :loading="loading">
                 <thead>
                     <tr>
                         <th class="text-left">ID</th>
@@ -40,9 +40,18 @@ import Item from '@/types/item'
 import { getItems } from '@/idb'
 
 const items = ref<Item[]>([])
+const loading = ref<boolean>(false)
 
 const getItemsFromIDB = async () => {
-    items.value = await getItems()
+    
+    loading.value = true
+    try {
+        items.value = await getItems()
+    } catch (error) {
+        
+    } finally {
+        loading.value = false
+    }
 }
 
 onMounted( () => {
