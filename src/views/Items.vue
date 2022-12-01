@@ -39,7 +39,7 @@ import { ref, onMounted} from 'vue';
 import Item from '@/types/item'
 import { getItems } from '@/idb'
 
-const items = ref<[Item] | []>([])
+const items = ref<Item[]>([])
 
 const getItemsFromIDB = async () => {
     items.value = await getItems()

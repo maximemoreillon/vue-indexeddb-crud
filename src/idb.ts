@@ -14,9 +14,9 @@ const KEYPATH = '_id'
 import Item from '@/types/item'
 
 // Not elegant
-let db :any
+let db: IDBDatabase
 
-const getDb = async () => new Promise((resolve, reject) => {
+const getDb = async () => new Promise < IDBDatabase >((resolve, reject) => {
 
     // if already db open, just use it
     if (db) { return resolve(db); }
@@ -47,8 +47,7 @@ const getDb = async () => new Promise((resolve, reject) => {
 
 export const createItem = async (newItem: Item) => {
 
-    // TODO: find type
-    const db:any = await getDb();
+    const db = await getDb();
 
     return new Promise(resolve => {
 
@@ -65,46 +64,31 @@ export const createItem = async (newItem: Item) => {
 
 export const getItems = async () => {
 
-    // TODO: find type
-    const db:any = await getDb();
+    const db = await getDb();
 
-    return new Promise<[Item] | []>(resolve => {
+    return new Promise<Item[]>((resolve, reject) => {
 
         const transaction = db.transaction(OBJECTSTORE_NAME, 'readonly')
+        const store = transaction.objectStore(OBJECTSTORE_NAME)
 
-        transaction.oncomplete = () => {
-            resolve(items);
-        }
+        const request = store.getAll()
 
-        // Otherwise: const request = store.getAll();
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
 
-
-        let store = transaction.objectStore(OBJECTSTORE_NAME);
-        const items: any = [];
-
-        store.openCursor().onsuccess = (e: any) => {
-            let cursor = e.target.result;
-            if (cursor) {
-                items.push(cursor.value)
-                cursor.continue();
-            }
-        }
+        request.onerror = reject;
 
     })
 }
 
 export const getItem = async (_id:string) => {
 
-    // Not working yet
-
-    // TODO: find type
-    const db: any = await getDb();
+    const db = await getDb();
 
     return new Promise<Item>((resolve, reject) => {
 
         const transaction = db.transaction(OBJECTSTORE_NAME, 'readonly');
-        transaction.oncomplete = resolve
-
         const store = transaction.objectStore(OBJECTSTORE_NAME)
 
         const request = store.get(Number(_id))

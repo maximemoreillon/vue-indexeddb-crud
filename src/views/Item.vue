@@ -32,7 +32,7 @@ import { getItem, deleteItem } from '@/idb'
 const route = useRoute()
 const router = useRouter()
 
-const itemId = computed(() => route.params._id )
+const itemId = computed(() => Array.isArray(route.params._id) ? route.params._id[0] : route.params._id )
 const item = ref<Item | undefined>(undefined)
 
 onMounted( () => {
@@ -40,7 +40,6 @@ onMounted( () => {
 })
 
 const getItemFromIDB = async () => {
-    // TODO: Fix type mismatch
     item.value = await getItem(itemId.value)
 }
 
@@ -49,7 +48,6 @@ const updateItemInIDB = async () => {
 }
 
 const deleteItemFromIDB = async () => {
-    // TODO: Fix type mismatch
     await deleteItem(itemId.value)
     router.push({name: 'Items'})
 }
