@@ -3,8 +3,20 @@ References:
 
 https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
 https://www.raymondcamden.com/2019/10/16/using-indexeddb-with-vuejs
+https://web.dev/indexeddb/
 
 */
+
+
+/*
+
+## Todo:
+
+* [ ] try return transaction.complete
+
+
+*/
+
 
 const DB_NAME = 'itemdb';
 const DB_VERSION = 1;
@@ -24,10 +36,7 @@ const getDb = async () => new Promise < IDBDatabase >((resolve, reject) => {
 
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-    request.onerror = e => {
-        console.log('Error opening db', e);
-        reject('Error');
-    };
+    request.onerror = reject
 
     request.onsuccess = () => {
         db = request.result;
@@ -35,11 +44,9 @@ const getDb = async () => new Promise < IDBDatabase >((resolve, reject) => {
     };
 
     request.onupgradeneeded =  () => {
-        console.log('onupgradeneeded');
-        let db = request.result;
-
-        // Creating the object store
-        const store = db.createObjectStore(OBJECTSTORE_NAME, { autoIncrement: true, keyPath: KEYPATH });
+        console.log('onupgradeneeded')
+        const db = request.result
+        const store = db.createObjectStore(OBJECTSTORE_NAME, { autoIncrement: true, keyPath: KEYPATH })
         store.createIndex(KEYPATH, KEYPATH)
     }
 
@@ -56,7 +63,8 @@ export const createItem = async (newItem: Item) => {
         transaction.oncomplete = resolve
 
         const store = transaction.objectStore(OBJECTSTORE_NAME);
-        store.put(newItem);
+        // Note: store.put can be used instead
+        store.add(newItem)
 
     });
 
@@ -82,7 +90,7 @@ export const getItems = async () => {
     })
 }
 
-export const getItem = async (_id:string) => {
+export const getItem = async (itemId:string) => {
 
     const db = await getDb();
 
@@ -91,7 +99,7 @@ export const getItem = async (_id:string) => {
         const transaction = db.transaction(OBJECTSTORE_NAME, 'readonly');
         const store = transaction.objectStore(OBJECTSTORE_NAME)
 
-        const request = store.get(Number(_id))
+        const request = store.get(Number(itemId))
 
         request.onsuccess = () => {
             resolve(request.result);
@@ -102,27 +110,36 @@ export const getItem = async (_id:string) => {
         
     });
 }
-
     
 
+export const updateItem = async(itemData: Item)  => {
+    // Node: store.put will add item if the key is not matched
 
-
-
-// TODO: Update
-
-
-export const deleteItem = async (itemId: string) => {
-
-    // TODO: find type
-    const db: any = await getDb();
+    const db = await getDb();
 
     return new Promise(resolve => {
 
-        let trans = db.transaction(['items'], 'readwrite');
-        trans.oncomplete = resolve
+        const transaction = db.transaction(OBJECTSTORE_NAME, 'readwrite');
+        transaction.oncomplete = resolve
 
-        let store = trans.objectStore('items');
-        store.delete(itemId);
+        const store = transaction.objectStore(OBJECTSTORE_NAME);
+        store.put(itemData);
+
+    });
+
+}
+
+export const deleteItem = async (itemId: string) => {
+
+    const db = await getDb()
+
+    return new Promise(resolve => {
+
+        const transaction = db.transaction(OBJECTSTORE_NAME, 'readwrite');
+        transaction.oncomplete = resolve
+
+        const store = transaction.objectStore(OBJECTSTORE_NAME);
+        store.delete(Number(itemId));
     });
 }
 

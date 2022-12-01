@@ -27,7 +27,7 @@
 import { ref, computed, onMounted} from 'vue'
 import { useRoute, useRouter} from 'vue-router'
 import Item from '@/types/item'
-import { getItem, deleteItem } from '@/idb'
+import { getItem, deleteItem, updateItem} from '@/idb'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,12 +44,13 @@ const getItemFromIDB = async () => {
 }
 
 const updateItemInIDB = async () => {
-    alert('not implemented')
+    if (!item.value) return
+    await updateItem({...item.value})
 }
 
 const deleteItemFromIDB = async () => {
     await deleteItem(itemId.value)
-    router.push({name: 'Items'})
+    router.push({name: 'items'})
 }
 
 
