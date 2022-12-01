@@ -37,7 +37,7 @@
 import NewItemDialog from '@/components/NewItemDialog.vue';
 import { ref, onMounted} from 'vue';
 import Item from '@/types/item'
-import { getItems } from '@/idb'
+import { db } from '@/idb'
 
 const items = ref<Item[]>([])
 const loading = ref<boolean>(false)
@@ -46,7 +46,7 @@ const getItemsFromIDB = async () => {
     
     loading.value = true
     try {
-        items.value = await getItems()
+        items.value = await db.items.toArray()
     } catch (error) {
         
     } finally {

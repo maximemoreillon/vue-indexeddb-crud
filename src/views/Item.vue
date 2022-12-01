@@ -4,8 +4,8 @@
             <v-btn icon="mdi-arrow-left" :to="{name: 'items'}" />
             <v-toolbar-title>Item {{ itemId }}</v-toolbar-title>
             <v-spacer />
-            <v-btn icon="mdi-content-save" @click="updateItemInIDB()" :loading="updating"/>
-            <v-btn color="#c00000" icon="mdi-delete" @click="deleteItemFromIDB" :loading="deleting"/>
+            <v-btn icon="mdi-content-save" @click="updateItem()" :loading="updating"/>
+            <v-btn color="#c00000" icon="mdi-delete" @click="deleteItem" :loading="deleting"/>
         </v-toolbar>
         <v-card-text v-if="item">
             <v-row>
@@ -26,7 +26,7 @@
 
 import { ref, computed, onMounted} from 'vue'
 import { useRoute, useRouter} from 'vue-router'
-import { getItem, deleteItem, updateItem } from '@/idb'
+import { db } from '@/idb'
 import Item from '@/types/item'
 
 const route = useRoute()
@@ -41,42 +41,50 @@ const deleting = ref<boolean>(false)
 
 
 onMounted( () => {
-    getItemFromIDB()
+    getItem()
 })
 
-const getItemFromIDB = async () => {
+const getItem = async () => {
     
     loading.value = true
     try {
-        item.value = await getItem(itemId.value)
+        const query = { _id: Number(itemId.value)}
+        item.value = await db.items
+            .where(query)
+            .first()
     } catch (error) {
-
+        alert('Update failed')
+        console.error(error)
     } finally {
         loading.value = false
     }
 }
 
-const updateItemInIDB = async () => {
+const updateItem = async () => {
     if (!item.value) return
 
     updating.value = true
     try {
-        await updateItem({ ...item.value })
+        await db.items.put({...item.value})
+        alert('Update successful')
     } catch (error) {
+        alert('Update failed')
+        console.error(error)
 
     } finally {
         updating.value = false
     }
 }
 
-const deleteItemFromIDB = async () => {
+const deleteItem = async () => {
     
     deleting.value = true
     try {
-        await deleteItem(itemId.value)
+        await db.items.delete(Number(itemId.value))
         router.push({ name: 'items' })
     } catch (error) {
-
+        alert('Update failed')
+        console.error(error)
     } finally {
         deleting.value = false
     }
