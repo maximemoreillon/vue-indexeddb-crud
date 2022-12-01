@@ -27,7 +27,7 @@
 import { ref, computed, onMounted} from 'vue'
 import { useRoute, useRouter} from 'vue-router'
 import Item from '@/types/item'
-import { getItem } from '@/idb'
+import { getItem, deleteItem } from '@/idb'
 
 const route = useRoute()
 const router = useRouter()
@@ -40,16 +40,18 @@ onMounted( () => {
 })
 
 const getItemFromIDB = async () => {
-    const item = await getItem(itemId.value)
-    console.log(item)
+    // TODO: Fix type mismatch
+    item.value = await getItem(itemId.value)
 }
 
 const updateItemInIDB = async () => {
-    console.warn('not implemented')
+    alert('not implemented')
 }
 
 const deleteItemFromIDB = async () => {
-    alert('not implemented')
+    // TODO: Fix type mismatch
+    await deleteItem(itemId.value)
+    router.push({name: 'Items'})
 }
 
 

@@ -9,6 +9,7 @@ https://www.raymondcamden.com/2019/10/16/using-indexeddb-with-vuejs
 const DB_NAME = 'itemdb';
 const DB_VERSION = 1;
 const OBJECTSTORE_NAME = 'items'
+const KEYPATH = '_id'
 
 import Item from '@/types/item'
 
@@ -38,7 +39,8 @@ const getDb = async () => new Promise((resolve, reject) => {
         let db = request.result;
 
         // Creating the object store
-        db.createObjectStore(OBJECTSTORE_NAME, { autoIncrement: true, keyPath: '_id' });
+        const store = db.createObjectStore(OBJECTSTORE_NAME, { autoIncrement: true, keyPath: KEYPATH });
+        store.createIndex(KEYPATH, KEYPATH)
     }
 
 })
@@ -103,18 +105,16 @@ export const getItem = async (_id:string) => {
         const transaction = db.transaction(OBJECTSTORE_NAME, 'readonly');
         transaction.oncomplete = resolve
 
-        const store = transaction.objectStore('items')
+        const store = transaction.objectStore(OBJECTSTORE_NAME)
 
-        const myIndex = store.index('_id');
-        const request = myIndex.get(1);
+        const request = store.get(Number(_id))
 
+        request.onsuccess = () => {
+            resolve(request.result);
+        };
 
+        request.onerror = reject;
 
-        request.onsuccess = (event: any) => {
-            console.log(event)
-            resolve(event.target.result)
-        }
-        request.onerror = reject
         
     });
 }
