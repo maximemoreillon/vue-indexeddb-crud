@@ -34,7 +34,6 @@ const router = useRouter()
 
 const itemId = computed(() => Array.isArray(route.params._id) ? route.params._id[0] : route.params._id )
 const item = ref<Item | undefined>(undefined)
-
 const loading = ref<boolean>(false)
 const updating = ref<boolean>(false)
 const deleting = ref<boolean>(false)
@@ -53,7 +52,7 @@ const getItem = async () => {
             .where(query)
             .first()
     } catch (error) {
-        alert('Update failed')
+        alert('Failed to query item')
         console.error(error)
     } finally {
         loading.value = false
@@ -83,7 +82,7 @@ const deleteItem = async () => {
         await db.items.delete(Number(itemId.value))
         router.push({ name: 'items' })
     } catch (error) {
-        alert('Update failed')
+        alert('Deletion failed')
         console.error(error)
     } finally {
         deleting.value = false

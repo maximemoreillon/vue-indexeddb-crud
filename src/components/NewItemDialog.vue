@@ -1,5 +1,6 @@
 <template>
     <v-dialog v-model="dialog" max-width="30rem">
+
         <template v-slot:activator="{ props }">
             <v-btn v-bind="props" icon="mdi-plus"/>
         </template>
@@ -12,15 +13,14 @@
                         <v-col>
                             <v-text-field
                                 label="Name"
-                                v-model="newItem.name"
-                            ></v-text-field>
+                                v-model="newItem.name" />
                         </v-col>
                     </v-row>
                     <v-row>
                         <v-col>
                             <v-text-field 
                                 label="Description" 
-                                v-model="newItem.description"></v-text-field>
+                                v-model="newItem.description" />
                         </v-col>
                     </v-row>
                 </v-card-text>
@@ -35,8 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
-import { db } from '@/idb';
+
+import { ref, reactive } from 'vue'
+import { db } from '@/idb'
+
 const dialog = ref(false)
 const loading = ref(false)
 

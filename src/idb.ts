@@ -7,16 +7,14 @@ const STORES = {
     items: '++_id'
 }
 
-
-
 export class SubClassedDexie extends Dexie {
-    items!: Table<Item> // Not sure what this syntax means
-
-    constructor() {
-        super(DB_NAME)
-        this.version(DB_VERSION).stores(STORES)
+    items!: Table<Item> // Used for type definition
+    constructor(dbName: string) {
+        super(dbName)
     }
 }
 
 
-export const db = new SubClassedDexie()
+export const db = new SubClassedDexie(DB_NAME)
+
+db.version(DB_VERSION).stores(STORES)
